@@ -1,0 +1,56 @@
+name: Build iOS (unsigned IPA)
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-latest
+    timeout-minutes: 300
+    steps:
+      - name: Checkout (with submodules)
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Install build tools
+        run: |
+          brew install meson ninja pkg-config cmake go
+
+      - name: Build porting libraries
+        run: |
+          make -C porting adb-mobile libsdl ffmpeg scrcpy vncclient openssl tsnet-forwarder
+
+      - name: Install Pillow and generate server icon
+        run: |
+          pip3 install --break-system-packages pillow
+          python3 scripts/make_server_icon.py
+
+      - name: Build unsigned app
+        run: |
+          xcodebuild \
+            -project "scrcpy-app/Scrcpy Remote.xcodeproj" \
+            -scheme "Scrcpy Remote" \
+            -configuration Release \
+            -sdk iphoneos \
+            -destination 'generic/platform=iOS' \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" \
+            -derivedDataPath build
+
+      - name: Package unsigned IPA
+        run: |
+          mkdir -p Payload
+          cp -r "build/Build/Products/Release-iphoneos/Scrcpy Remote.app" Payload/
+          zip -r server-unsigned.ipa Payload
+          ls -lh server-unsigned.ipa
+
+      - name: Upload IPA
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-ipa-unsigned
+          path: server-unsigned.ipa
+          if-no-files-found: error
