@@ -38,6 +38,12 @@ jobs:
           printf '# protobuf %s\n' "${PROTOC_VERSION}" > porting/protobuf.rb
           grep "${PROTOC_VERSION}" external/adb-mobile/porting/protobuf.rb
 
+      - name: Fetch protobuf tags
+        run: |
+          cd external/adb-mobile/external/protobuf
+          git fetch --tags
+          git rev-parse v28.3
+
       - name: Build porting libraries
         run: |
           make -C porting adb-mobile libsdl ffmpeg scrcpy vncclient openssl tsnet-forwarder
