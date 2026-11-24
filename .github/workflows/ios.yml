@@ -19,9 +19,18 @@ jobs:
         run: |
           brew install meson ninja pkg-config cmake go
 
-      - name: Install protobuf and create version file
+      - name: Install CMake 3.31 and protoc 28.3
         run: |
-          brew install protobuf
+          curl -fL -o /tmp/cmake.tar.gz https://github.com/Kitware/CMake/releases/download/v3.31.6/cmake-3.31.6-macos-universal.tar.gz
+          mkdir -p /tmp/cmake-3.31
+          tar -xzf /tmp/cmake.tar.gz -C /tmp/cmake-3.31 --strip-components=1
+          echo "/tmp/cmake-3.31/CMake.app/Contents/bin" >> "$GITHUB_PATH"
+          curl -fL -o /tmp/protoc.zip https://github.com/protocolbuffers/protobuf/releases/download/v28.3/protoc-28.3-osx-universal_binary.zip
+          mkdir -p /tmp/protoc-28.3
+          unzip -o /tmp/protoc.zip -d /tmp/protoc-28.3
+          sudo cp /tmp/protoc-28.3/bin/protoc /usr/local/bin/protoc
+          /tmp/cmake-3.31/CMake.app/Contents/bin/cmake --version
+          protoc --version
           PROTOC_VERSION=$(protoc --version | cut -d' ' -f2)
           echo "protoc version: ${PROTOC_VERSION}"
           mkdir -p external/adb-mobile/porting
