@@ -11,7 +11,7 @@ import UIKit
 struct SessionCreateView: View {
     @State var sessionModel = ScrcpySessionModel()
     // Local input state so device type reacts instantly
-    @State private var hostInput: String = ""
+    @State private var hostInput: String = "192.168.0.163"
     @State private var portInput: String = ""
     @Environment(\.dismiss) var dismiss
     @EnvironmentObject var appSettings: AppSettings
