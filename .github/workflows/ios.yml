@@ -19,6 +19,16 @@ jobs:
         run: |
           brew install meson ninja pkg-config cmake go
 
+      - name: Install protobuf and create version file
+        run: |
+          brew install protobuf
+          PROTOC_VERSION=$(protoc --version | cut -d' ' -f2)
+          echo "protoc version: ${PROTOC_VERSION}"
+          mkdir -p external/adb-mobile/porting
+          printf '# protobuf %s\n' "${PROTOC_VERSION}" > external/adb-mobile/porting/protobuf.rb
+          printf '# protobuf %s\n' "${PROTOC_VERSION}" > porting/protobuf.rb
+          grep "${PROTOC_VERSION}" external/adb-mobile/porting/protobuf.rb
+
       - name: Build porting libraries
         run: |
           make -C porting adb-mobile libsdl ffmpeg scrcpy vncclient openssl tsnet-forwarder
