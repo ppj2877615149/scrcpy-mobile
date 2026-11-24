@@ -44,6 +44,10 @@ jobs:
           git fetch --tags
           git rev-parse v28.3
 
+      - name: Create libs output directories
+        run: |
+          mkdir -p porting/libs/iphoneos/arm64 porting/libs/iphonesimulator/arm64 porting/libs/iphonesimulator/x86_64
+
       - name: Build porting libraries
         run: |
           make -C porting adb-mobile libsdl ffmpeg scrcpy vncclient openssl tsnet-forwarder
