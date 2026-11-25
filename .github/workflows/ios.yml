@@ -55,6 +55,9 @@ jobs:
           sudo chmod +x /usr/local/bin/gas-preprocessor.pl
           which gas-preprocessor.pl
 
+      - name: Tidy libtsnet go.mod
+        run: |
+          cd porting/libtsnet && go mod tidy
       - name: Build porting libraries
         run: |
           make -C porting adb-mobile libsdl ffmpeg scrcpy vncclient openssl tsnet-forwarder
